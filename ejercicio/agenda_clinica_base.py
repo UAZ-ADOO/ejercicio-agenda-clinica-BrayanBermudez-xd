@@ -9,33 +9,40 @@ class CanalConfirmacion(ABC):
 
 class EmailCanal(CanalConfirmacion):
     def enviar_confirmacion(self, destinatario: str, mensaje: str) -> None:
-        # TODO: implementar envio por email.
-        raise NotImplementedError("Checkpoint 1: implementa el canal de email.")
+        print (f"[EMAIL] confirmacion enviada a {destinatario}: {mensaje} ")
 
 
 class SmsCanal(CanalConfirmacion):
     def enviar_confirmacion(self, destinatario: str, mensaje: str) -> None:
-        # TODO: implementar envio por SMS.
-        raise NotImplementedError("Checkpoint 1: implementa el canal de SMS.")
+      print (f"[SMS] confirmacion enviada a {destinatario}: {mensaje} ")
 
 
 class WhatsAppCanal(CanalConfirmacion):
     def enviar_confirmacion(self, destinatario: str, mensaje: str) -> None:
-        # TODO: implementar envio por WhatsApp.
-        raise NotImplementedError("Checkpoint 1: implementa el canal de WhatsApp.")
+        print (f"[WHASTSAPP] confirmacion enviada a {destinatario}: {mensaje} ")
 
 
 class LlamadaCanal(CanalConfirmacion):
     def enviar_confirmacion(self, destinatario: str, mensaje: str) -> None:
-        # TODO: implementar envio por llamada automatizada.
-        raise NotImplementedError("Checkpoint 1: implementa el canal de llamada.")
+        print (f"[LLAMADA] confirmacion enviada a {destinatario}: {mensaje} ")
 
 
 class FabricaCanalesConfirmacion:
     @staticmethod
     def crear_canal(tipo: str) -> CanalConfirmacion:
-        # TODO: regresar el canal correcto segun el tipo recibido.
-        raise NotImplementedError("Checkpoint 2: implementa la fabrica de canales.")
+        tipo =  tipo.lower()
+        if tipo == "email":
+           return  EmailCanal()
+        elif tipo == "sms":
+           return SmsCanal()
+        elif tipo == "whatsapp":
+           return WhatsAppCanal()
+        elif tipo == "llamada":
+           return LlamadaCanal()
+        else:
+            raise ValueError(f"canal no sportado o no existe dentro de los parametros establecidos{tipo}")
+
+
 
 
 class AgendaMedica:
@@ -106,8 +113,14 @@ class AgendamientoFacade:
         horario: str,
         canal: CanalConfirmacion,
     ) -> None:
-        # TODO: validar disponibilidad, registrar y confirmar la cita.
-        raise NotImplementedError("Checkpoint 3: completa la fachada de agendamiento.")
+        if not self.agenda.horario_disponible(horario):
+            raise ValueError(f"El horario {horario} no esta disponible")
+        self.agenda.apartar_horario(horario)
+        folio = self.registro.registrar(paciente, medico, horario)
+        mensaje = self.recordatorios.preparar_mensaje(paciente, medico, horario, folio)
+        canal.enviar_confirmacion(contacto, mensaje)
+        print(f"cita agendada correctamente")
+        return folio
 
 
 def main() -> None:
@@ -119,7 +132,7 @@ def main() -> None:
 
     canal_email = FabricaCanalesConfirmacion.crear_canal("email")
     canal_sms = FabricaCanalesConfirmacion.crear_canal("sms")
-    canal_whatsapp = FabricaCanalesConfirmacion.crear_canal("whatsapp")
+    canal_whatsapp = FabricaCanalesConfirmacion.crear_canal("whatsApp")
     canal_llamada = FabricaCanalesConfirmacion.crear_canal("llamada")
 
     fachada.agendar_cita(
@@ -153,7 +166,7 @@ def main() -> None:
         "2026-05-12 18:00",
         canal_llamada,
     )
-
+   
 
 if __name__ == "__main__":
     main()
